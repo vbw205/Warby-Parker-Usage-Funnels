@@ -1,0 +1,15 @@
+-- SELECT * FROM survey LIMIT 10;
+-- SELECT question, COUNT(user_id) as number_answered FROM survey GROUP BY question;
+-- SELECT * FROM quiz LIMIT 5;
+-- SELECT * FROM home_try_on LIMIT 5;
+-- SELECT * FROM purchase LIMIT 5;
+
+-- SELECT DISTINCT quiz.user_id, home_try_on.user_id IS NOT NULL AS 'is_home_try_on', home_try_on.number_of_pairs, purchase.user_id IS NOT NULL AS 'is_purchase' FROM quiz LEFT JOIN home_try_on ON quiz.user_id = home_try_on.user_id LEFT JOIN purchase ON home_try_on.user_id = purchase.user_id LIMIT 10;
+
+WITH funnel AS (SELECT DISTINCT q.user_id, h.user_id IS NOT NULL AS 'is_home_try_on', h.number_of_pairs, p.user_id IS NOT NULL AS 'is_purchase' FROM quiz q LEFT JOIN home_try_on h ON q.user_id = h.user_id LEFT JOIN purchase p ON h.user_id = p.user_id)
+
+-- conversation rate for different pair amounts:
+SELECT number_of_pairs, ROUND(1.0 * SUM(is_purchase) / COUNT(user_id), 2) as conversion_rate FROM funnel WHERE number_of_pairs IS NOT NULL GROUP BY 1;
+
+-- overal conversion rate:
+-- SELECT ROUND(1.0 * SUM(is_purchase) / COUNT(user_id), 2) AS overall_cr FROM funnel;
